@@ -1,11 +1,9 @@
 docker-alpine
 ================
 
-note: this container still not ready..
-
 The docker-alpine base on quantumobject/docker-baseimage but using alpine/edge image to create small container with runit include the same way that quantumobject/docker-baseimage work.
 
-This image will be use to builds others image for [quantumobject](http://www.quantumobject.com) at the moment. It will be build periodical to make sure that any security update is include with the last version from alpine.
+This image will be use to builds others image for [quantumobject](http://www.quantumobject.org) at the moment. It will be build periodical to make sure that any security update is include with the last version from alpine.
 
 ## Using docker-alpine as base image
 
