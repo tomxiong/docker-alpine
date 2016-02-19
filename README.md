@@ -3,7 +3,7 @@ docker-alpine
 
 note: this container still not ready..
 
-The docker-alpine base on quantumobject/docker-baseimage but using alpine/edge image to create small container with runit include the same way that quantumobject/docker-baseimage working.
+The docker-alpine base on quantumobject/docker-baseimage but using alpine/edge image to create small container with runit include the same way that quantumobject/docker-baseimage work.
 
 This image will be use to builds others image for [quantumobject](http://www.quantumobject.com) at the moment. It will be build periodical to make sure that any security update is include with the last version from alpine.
 
@@ -45,7 +45,7 @@ Note that the shell script must run the daemon **without letting it daemonize/fo
 
 ### Running scripts during container startup
 
-The docker-baseimage init system, `/sbin/my_init`, runs the following scripts during startup, in the following order:
+The docker-alpine init system, `/sbin/my_init`, runs the following scripts during startup, in the following order:
 
  * All executable scripts in `/etc/my_init.d`, if this directory exists. The scripts are run in lexicographic order.
  * The script `/etc/rc.local`, if this file exists.
