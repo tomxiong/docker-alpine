@@ -58,7 +58,7 @@ def is_exe(path):
         except OSError:
                 return False
 
-def import_envvars(clear_existing_environment = True, override_existing_environm                                                                                                 ent = True):
+def import_envvars(clear_existing_environment = True, override_existing_environment = True):
         if not os.path.exists("/etc/container_environment"):
                 return
         new_env = {}
@@ -84,9 +84,9 @@ def export_envvars(to_dir = True):
                 if name in ['HOME', 'USER', 'GROUP', 'UID', 'GID', 'SHELL']:
                         continue
                 if to_dir:
-                        with open("/etc/container_environment/" + name, "w") as                                                                                                  f:
+                        with open("/etc/container_environment/" + name, "w") as f:
                                 f.write(value)
-                shell_dump += "export " + sanitize_shenvname(name) + "=" + shquo                                                                                                 te(value) + "\n"
+                shell_dump += "export " + sanitize_shenvname(name) + "=" + shquote(value) + "\n"
         with open("/etc/container_environment.sh", "w") as f:
                 f.write(shell_dump)
         with open("/etc/container_environment.json", "w") as f:
@@ -142,7 +142,7 @@ def waitpid_reap_other_children(pid):
                                 raise
         return status
 
-def stop_child_process(name, pid, signo = signal.SIGTERM, time_limit = KILL_PROC                                                                                                 ESS_TIMEOUT):
+def stop_child_process(name, pid, signo = signal.SIGTERM, time_limit = KILL_PROCESS_TIMEOUT):
         info("Shutting down %s (PID %d)..." % (name, pid))
         try:
                 os.kill(pid, signo)
@@ -155,7 +155,7 @@ def stop_child_process(name, pid, signo = signal.SIGTERM, time_limit = KILL_PROC
                 except OSError:
                         pass
         except AlarmException:
-                warn("%s (PID %d) did not shut down in time. Forcing it to exit.                                                                                                 " % (name, pid))
+                warn("%s (PID %d) did not shut down in time. Forcing it to exit." % (name, pid))
                 try:
                         os.kill(pid, signal.SIGKILL)
                 except OSError:
@@ -181,7 +181,7 @@ def run_command_killable(*argv):
                 if status is None:
                         error("%s exited with unknown status\n" % filename)
                 else:
-                        error("%s failed with status %d\n" % (filename, os.WEXIT                                                                                                 STATUS(status)))
+                        error("%s failed with status %d\n" % (filename, os.WEXITSTATUS(status)))
                 sys.exit(1)
 
 def run_command_killable_and_import_envvars(*argv):
@@ -208,7 +208,7 @@ def kill_all_processes(time_limit):
                                 else:
                                         raise
         except AlarmException:
-                warn("Not all processes have exited in time. Forcing them to exi                                                                                                 t.")
+                warn("Not all processes have exited in time. Forcing them to exit.")
                 try:
                         os.kill(-1, signal.SIGKILL)
                 except OSError:
@@ -251,7 +251,7 @@ def wait_for_runit_services():
         debug("Waiting for runit services to exit...")
         done = False
         while not done:
-                done = os.system("/sbin/sv status /etc/service/* | grep -q '^run                                                                                                 :'") != 0
+                done = os.system("/sbin/sv status /etc/service/* | grep -q '^run:'") != 0
                 if not done:
                         time.sleep(0.1)
 
@@ -271,25 +271,25 @@ def main(args):
         try:
                 exit_status = None
                 if len(args.main_command) == 0:
-                        runit_exited, exit_code = wait_for_runit_or_interrupt(ru                                                                                                 nit_pid)
+                        runit_exited, exit_code = wait_for_runit_or_interrupt(runit_pid)
                         if runit_exited:
                                 if exit_code is None:
                                         info("Runit exited with unknown status")
                                         exit_status = 1
                                 else:
                                         exit_status = os.WEXITSTATUS(exit_code)
-                                        info("Runit exited with status %d" % exi                                                                                                 t_status)
+                                        info("Runit exited with status %d" % exit_status)
                 else:
                         info("Running %s..." % " ".join(args.main_command))
-                        pid = os.spawnvp(os.P_NOWAIT, args.main_command[0], args                                                                                                 .main_command)
+                        pid = os.spawnvp(os.P_NOWAIT, args.main_command[0], args.main_command)
                         try:
                                 exit_code = waitpid_reap_other_children(pid)
                                 if exit_code is None:
-                                        info("%s exited with unknown status." %                                                                                                  args.main_command[0])
+                                        info("%s exited with unknown status." % args.main_command[0])
                                         exit_status = 1
                                 else:
                                         exit_status = os.WEXITSTATUS(exit_code)
-                                        info("%s exited with status %d." % (args                                                                                                 .main_command[0], exit_status))
+                                        info("%s exited with status %d." % (args.main_command[0], exit_status))
                         except KeyboardInterrupt:
                                 stop_child_process(args.main_command[0], pid)
                                 raise
@@ -307,7 +307,7 @@ def main(args):
 
 # Parse options.
 parser = argparse.ArgumentParser(description = 'Initialize the system.')
-parser.add_argument('main_command', metavar = 'MAIN_COMMAND', type = str, nargs                                                                                                  = '*',
+parser.add_argument('main_command', metavar = 'MAIN_COMMAND', type = str, nargs = '*',
         help = 'The main command to run. (default: runit)')
 parser.add_argument('--skip-startup-files', dest = 'skip_startup_files',
         action = 'store_const', const = True, default = False,
@@ -319,7 +319,7 @@ parser.add_argument('--no-kill-all-on-exit', dest = 'kill_all_on_exit',
         action = 'store_const', const = False, default = True,
         help = 'Don\'t kill all processes on the system upon exiting')
 parser.add_argument('--quiet', dest = 'log_level',
-        action = 'store_const', const = LOG_LEVEL_WARN, default = LOG_LEVEL_INFO                                                                                                 ,
+        action = 'store_const', const = LOG_LEVEL_WARN, default = LOG_LEVEL_INFO,
         help = 'Only print warnings and errors')
 args = parser.parse_args()
 log_level = args.log_level
@@ -329,8 +329,8 @@ if args.skip_runit and len(args.main_command) == 0:
         sys.exit(1)
 
 # Run main function.
-signal.signal(signal.SIGTERM, lambda signum, frame: ignore_signals_and_raise_key                                                                                                 board_interrupt('SIGTERM'))
-signal.signal(signal.SIGINT, lambda signum, frame: ignore_signals_and_raise_keyb                                                                                                 oard_interrupt('SIGINT'))
+signal.signal(signal.SIGTERM, lambda signum, frame: ignore_signals_and_raise_keyboard_interrupt('SIGTERM'))
+signal.signal(signal.SIGINT, lambda signum, frame: ignore_signals_and_raise_keyboard_interrupt('SIGINT'))
 signal.signal(signal.SIGALRM, lambda signum, frame: raise_alarm_exception())
 try:
         main(args)
