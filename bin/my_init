@@ -1,9 +1,10 @@
 #! /bin/sh
+export LC_ALL=C TERM="xterm"
 
 env > /etc/envvars
 
 run_command () {
-if [ -x $1 ]; then
+   if [ -x $1 ]; then
         echo >&2 "*** Running: $1"
         $1
         retval=$?
@@ -15,15 +16,21 @@ if [ -x $1 ]; then
     fi
 }
 
-#running /etc/my_init.d/
-echo "Starting pre-service scritps in /etc/my_init.d"
-for script in /etc/my_init.d/*
-do
-    run_command $script
-done
+run_startup_files() {
+   #running /etc/my_init.d/
+   echo "Starting pre-service scritps in /etc/my_init.d"
+   for script in /etc/my_init.d/*
+    do
+     run_command $script
+   done
 
-# running /etc/rc.local 
-run_command /etc/rc.local
+   # running /etc/rc.local 
+   run_command /etc/rc.local
+}
+
+#condition for --skip-startup-files
+ run_startup_files
+#
 
 if [ $# -eq 0 ]; then
     exec /sbin/runsvdir -P /etc/service
