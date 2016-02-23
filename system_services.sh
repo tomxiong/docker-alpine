@@ -1,7 +1,11 @@
 #!/bin/sh
 set -e
-source /build/buildconfig
+export LC_ALL=C
 set -x
+
+#adding testing repository 
+echo "http://dl-4.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+apk --no-cache upgrade
 
 ## Install init process.
 cp /build/bin/my_init /sbin/
@@ -52,3 +56,10 @@ chmod +x /etc/service/cron/run
 rm -f /etc/cron.daily/standard
 rm -f /etc/cron.daily/password
 rm -f /etc/cron.weekly/fstrim
+
+## Often used tools.
+apk --no-cache add curl psmisc
+
+#cleanup
+rm -rf /build
+rm -rf /tmp/* /var/tmp/*
