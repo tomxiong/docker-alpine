@@ -16,7 +16,7 @@ The image is called `quantumobject/docker-alpine`, and is available on the Docke
 
     FROM quantumobject/docker-alpine
 
-    # Use baseimage-docker's init system.
+    # Use baseimage-alpine's init system.
     CMD ["/sbin/my_init"]
 
     # ...put your own build instructions here...
@@ -32,9 +32,9 @@ Here's an example showing you how a memcached server runit entry can be made.
 
     #!/bin/sh
     ### In memcached.sh (make sure this file is chmod +x):
-    # `/sbin/setuser memcache` runs the given command as the user `memcache`.
+    # `chpst -u memcache` runs the given command as the user `memcache`.
     # If you omit that part, the command will be run as root.
-    exec /sbin/setuser memcache /usr/bin/memcached >>/var/log/memcached.log 2>&1
+    exec  chpst -u memcache /usr/bin/memcached >>/var/log/memcached.log 2>&1
 
     ### In Dockerfile:
     RUN mkdir /etc/service/memcached
@@ -157,7 +157,7 @@ Normally, when you want to create a new container in order to run a single comma
 
 However the downside of this approach is that the init system is not started. That is, while invoking `COMMAND`, important daemons such as cron and syslog are not running. Also, orphaned child processes are not properly reaped, because `COMMAND` is PID 1.
 
-Baseimage-docker provides a facility to run a single one-shot command, while solving all of the aforementioned problems. Run a single command in the following manner:
+Baseimage-alpine provides a facility to run a single one-shot command, while solving all of the aforementioned problems. Run a single command in the following manner:
 
     docker run YOUR_IMAGE /sbin/my_init -- COMMAND ARGUMENTS ...
 
