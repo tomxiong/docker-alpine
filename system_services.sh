@@ -24,27 +24,6 @@ ln -s /etc/container_environment.sh /etc/profile.d/
 ## Install runit.
 apk --no-cache add runit
 
-## Install a syslog daemon.
-apk --no-cache add syslog-ng
-mkdir /etc/service/syslog-ng
-cp /build/runit/syslog-ng /etc/service/syslog-ng/run
-chmod +x /etc/service/syslog-ng/run
-mkdir -p /var/lib/syslog-ng
-mkdir -p /etc/default
-cp /build/config/syslog_ng_default /etc/default/syslog-ng
-touch /var/log/syslog
-chmod u=rw,g=r,o= /var/log/syslog
-cp /build/config/syslog-ng.conf /etc/syslog-ng/syslog-ng.conf
-
-## Install syslog to "docker logs" forwarder.
-mkdir /etc/service/syslog-forwarder
-cp /build/runit/syslog-forwarder /etc/service/syslog-forwarder/run
-chmod +x /etc/service/syslog-forwarder/run
-
-## Install logrotate.
-apk --no-cache add logrotate
-cp /build/config/logrotate_syslogng /etc/logrotate.d/syslog-ng
-
 ## Install cron daemon.
 mkdir /etc/service/cron
 chmod 600 /etc/crontabs
