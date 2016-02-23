@@ -2,8 +2,8 @@
 
 env > /etc/envvars
 
-Run_Command(){
-if [ -x $1]; then
+run_command () {
+if [ -x $1 ]; then
         echo >&2 "*** Running: $1"
         $1
         retval=$?
@@ -19,11 +19,11 @@ if [ -x $1]; then
 echo "Starting pre-service scritps in /etc/my_init.d"
 for script in /etc/my_init.d/*
 do
-    Run_Command $script
+    run_command $script
 done
 
 # running /etc/rc.local 
-Run_Command /etc/rc.local
+run_command /etc/rc.local
 
 if [ $# -eq 0 ]; then
     exec /sbin/runsvdir -P /etc/service
