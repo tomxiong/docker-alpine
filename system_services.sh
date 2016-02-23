@@ -37,7 +37,7 @@ rm -f /etc/cron.daily/password
 rm -f /etc/cron.weekly/fstrim
 
 ## Often used tools.
-apk --no-cache add curl psmisc
+apk --no-cache add psmisc
 
 #cleanup
 rm -rf /build
