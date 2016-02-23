@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-export LC_ALL=C
+export LC_ALL=C TERM="xterm"
 set -x
 
 #adding testing repository 
