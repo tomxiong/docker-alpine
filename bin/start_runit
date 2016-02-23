@@ -1,0 +1,34 @@
+#! /bin/sh
+
+env > /etc/envvars
+
+Run_Command(){
+if [ -x $1]; then
+        echo >&2 "*** Running: $1"
+        $1
+        retval=$?
+        if [ $retval != 0 ];
+        then
+            echo >&2 "*** Failed with return value: $?"
+            exit $retval
+        fi
+    fi
+}
+
+#running /etc/my_init.d/
+echo "Starting pre-service scritps in /etc/my_init.d"
+for script in /etc/my_init.d/*
+do
+    Run_Command $script
+done
+
+# running /etc/rc.local 
+Run_Command /etc/rc.local
+
+if [ $# -eq 0 ]; then
+    exec /sbin/runsvdir -P /etc/service
+fi
+/sbin/runsvdir -P /etc/service &
+
+[ "$1" == '--' ] && shift
+exec $@
