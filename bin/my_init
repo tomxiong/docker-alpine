@@ -29,15 +29,25 @@ run_startup_files() {
    run_command /etc/rc.local
 }
 
+start_runit () {
+   echo "Booting runit daemon..."
+   exec /sbin/runsvdir -P /etc/service
+}
+
+shutdown_runit_services() {
+   echo "Begin shutting down runit services..."
+   /sbin/sv down /etc/service/*
+}
+
 #condition for --skip-startup-files
 if ![ `echo $@ | grep -c "--skip-startup-files" ` -gt 0 ] ; then
- run_startup_files
+   run_startup_files
 fi
 
-if [ $# -eq 0 ]; then
-    exec /sbin/runsvdir -P /etc/service
+#condition for --skip-runit
+if ![ `echo $@ | grep -c "--skip-runit" ` -gt 0 ] ; then
+   start_runit
+  else 
+  [ "$1" == '--' ] && shift
+  exec $@
 fi
-/sbin/runsvdir -P /etc/service &
-
-[ "$1" == '--' ] && shift
-exec $@
