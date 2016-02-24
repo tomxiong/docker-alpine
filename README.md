@@ -1,9 +1,9 @@
-update 2/23/2016
+update 2/24/2016
 
 docker-alpine
 ================
 
-The docker-alpine base on quantumobject/docker-baseimage but using alpine/edge image to create small container with runit include the same way that quantumobject/docker-baseimage work.
+The docker-alpine base on quantumobject/docker-baseimage but using alpine/edge image to create small container with runit.
 
 This image will be use to builds others image for [quantumobject](http://www.quantumobject.org) at the moment. It will be build periodical to make sure that any security update is include with the last version from alpine.
 
@@ -34,7 +34,7 @@ Here's an example showing you how a memcached server runit entry can be made.
     ### In memcached.sh (make sure this file is chmod +x):
     # `chpst -u memcache` runs the given command as the user `memcache`.
     # If you omit that part, the command will be run as root.
-    exec  chpst -u memcache /usr/bin/memcached >>/var/log/memcached.log 2>&1
+    exec 2>&1 chpst -u memcache /usr/bin/memcached
 
     ### In Dockerfile:
     RUN mkdir /etc/service/memcached
@@ -42,6 +42,19 @@ Here's an example showing you how a memcached server runit entry can be made.
 
 Note that the shell script must run the daemon **without letting it daemonize/fork it**. Usually, daemons provide a command line flag or a config file option for that.
 
+### Adding logs for your daemons services
+
+You can add log for the service using already include commad and procedure on runit. In this case you need to add another `run` script at directory `/etc/service/<NAME>/log` 
+
+        #!/bin/sh
+        #need to make sure /var/log/<name> already create.
+        exec svlogd -t /var/log/memcached/
+
+        ### In Dockerfile:
+        RUN mkdir /etc/service/memcached/log
+        RUN mkdir /var/log/memcached
+        RUN cp /var/log/cron/config /var/log/memcached/config  # copy config for svlogd from cron config
+        ADD memcached_log.sh /etc/service/memcached/log/run
 
 ### Running scripts during container startup
 
@@ -84,7 +97,7 @@ For example, here's how you can define an environment variable from your Dockerf
 
 You can verify that it works, as follows:
 
-    $ docker run -t -i <YOUR_NAME_IMAGE> /sbin/my_init -- bash -l
+    $ docker run -t -i <YOUR_NAME_IMAGE> /sbin/my_init -- sh -l
     ...
     *** Running bash -l...
     # echo $MY_NAME
