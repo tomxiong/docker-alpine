@@ -1,7 +1,5 @@
 #!/bin/sh
-set -e
 export LC_ALL=C TERM="xterm"
-set -x
 
 #adding testing repository 
 echo "http://dl-4.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
