@@ -4,6 +4,8 @@ export LC_ALL=C TERM="xterm"
 set -x
 env > /etc/envvars
 
+temp_var=$@
+
 run_command () {
    if [ -x $1 ]; then
         echo >&2 "*** Running: $1"
@@ -40,14 +42,21 @@ shutdown_runit_services() {
 }
 
 #condition for --skip-startup-files
-if ! [ `echo $@ | grep -c "\-\-skip-startup-files" ` -gt 0 ] ; then
+if ! [ `echo $temp_var | grep -c "\-\-skip-startup-files" ` -gt 0 ] ; then
    run_startup_files
+ else
+   temp_var=$(echo $temp_var|sed "s/--skip-startup-files//")
 fi
 
 #condition for --skip-runit
-if ! [ `echo $@ | grep -c "\-\-skip-runit" ` -gt 0 ] ; then
+if ! [ `echo $temp_var | grep -c "\-\-skip-runit" ` -gt 0 ] ; then
    start_runit
   else 
-  [ "$1" == '--' ] && shift
-  exec $@
+   temp_var=$(echo $temp_var|sed "s/--skip-runit//")
+   temp_var=$(echo $temp_var|sed "s/--//")
+   if [ temp_var -gt 0 ] ; then 
+     exec $temp_var
+   else
+    echo "wrong options"
+   fi
 fi
