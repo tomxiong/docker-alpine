@@ -58,8 +58,18 @@ if ! (([ `echo $temp_var | grep -c "\-\-help" ` -gt 0 ] || [ `echo $temp_var | g
   echo "  -h, --help            show this help message and exit"
   echo "  --skip-startup-files  Skip running /etc/my_init.d/* and /etc/rc.local"
   echo "  --skip-runit          Do not run runit services"
+  echo "  --quiet               Only print warnings and errors"
   exit 0
 fi
+
+#condition for --quiet
+if ! [ `echo $temp_var | grep -c "\-\-quiet" ` -gt 0 ] ; then
+   continue
+ else
+   temp_var=$(echo $temp_var|sed "s/--quiet//")
+   echo "--quiet still need to be implememted"
+fi
+
 
 #condition for --skip-startup-files
 if ! [ `echo $temp_var | grep -c "\-\-skip-startup-files" ` -gt 0 ] ; then
