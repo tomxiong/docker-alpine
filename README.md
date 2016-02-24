@@ -193,11 +193,11 @@ For example:
     *** Shutting down runit daemon (PID 80)...
     *** Killing all processes...
 
-You may find that the default invocation is too noisy. Or perhaps you don't want to run the startup files. You can customize all this by passing arguments to `my_init`. Invoke `docker run YOUR_IMAGE /sbin/my_init --help` for more information.
+Maybe you don't want to run the startup files. You can customize by passing arguments to `my_init`. Invoke `docker run YOUR_IMAGE /sbin/my_init --help` for more information.
 
-The following example runs `ls` without running the startup files and with less messages, while running all runit services:
+The following example runs `ls` without running the startup files while running all runit services:
 
-    $ docker run quantumobject/docker-alpine /sbin/my_init --skip-startup-files --quiet -- ls
+    $ docker run quantumobject/docker-alpine /sbin/my_init --skip-startup-files -- ls
     bin  boot  dev  etc  home  image  lib  lib64  media  mnt  opt  proc  root  run  sbin  selinux  srv  sys  tmp  usr  var
 
 
