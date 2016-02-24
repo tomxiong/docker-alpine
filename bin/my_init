@@ -1,7 +1,8 @@
 #! /bin/sh
-set -e
 export LC_ALL=C TERM="xterm"
-set -x
+
+trap 'shutdown_runit_services' INT
+
 env > /etc/envvars
 
 temp_var=$@
@@ -27,19 +28,38 @@ run_startup_files() {
      run_command $script
    done
 
-   # running /etc/rc.local 
+   # running /etc/rc.local
    run_command /etc/rc.local
 }
 
 start_runit () {
    echo "Booting runit daemon..."
-   exec /sbin/runsvdir -P /etc/service
+   /sbin/runsvdir -P /etc/service &
 }
 
 shutdown_runit_services() {
+   #need to check if runit service is runnung before shutdown ..
    echo "Begin shutting down runit services..."
    /sbin/sv down /etc/service/*
+   #need to give some time and check if service is down if time greater than allow them force exit
+   exit 0
 }
+
+#condition for --help
+if ! (([ `echo $temp_var | grep -c "\-\-help" ` -gt 0 ] || [ `echo $temp_var | grep -c "\-h" ` -gt 0 ])) ; then
+  continue
+ else
+  echo "usage: my_init [-h|--help] [--skip-startup-files] [--skip-runit]"
+  echo "                           [-- MAIN_COMMAND "
+  echo "Initialize the system."
+  echo "positional arguments:"
+  echo "MAIN_COMMAND          The main command to run."
+  echo "optional arguments:"
+  echo "  -h, --help            show this help message and exit"
+  echo "  --skip-startup-files  Skip running /etc/my_init.d/* and /etc/rc.local"
+  echo "  --skip-runit          Do not run runit services"
+  exit 0
+fi
 
 #condition for --skip-startup-files
 if ! [ `echo $temp_var | grep -c "\-\-skip-startup-files" ` -gt 0 ] ; then
@@ -51,12 +71,31 @@ fi
 #condition for --skip-runit
 if ! [ `echo $temp_var | grep -c "\-\-skip-runit" ` -gt 0 ] ; then
    start_runit
-  else 
+ else
    temp_var=$(echo $temp_var|sed "s/--skip-runit//")
-   temp_var=$(echo $temp_var|sed "s/--//")
-   if ! [ "$temp_var" == "" ] ; then 
+   if  [ `echo $temp_var | grep -c "\-\- " ` -gt 0 ] ; then
+     temp_var=$(echo $temp_var|sed "s/--//")
      exec $temp_var
-   else
-    echo "need to add command to do something"
+     exit 0
+    else
+      echo "Need to add command to do something:  -- command"
+      exit 0
    fi
 fi
+
+if  [ `echo $temp_var | grep -c "\-\- " ` -gt 0 ] ; then
+temp_var=$(echo $temp_var|sed "s/--//")
+ if ! [ "$temp_var" == "" ] ; then
+     #need to check if all service are online before executing command
+     sleep 5  #need to be replace with condition for before comment
+     exec $temp_var
+     shutdown_runit_services
+ else
+  echo "Need to add command to do something: -- command "
+  shutdown_runit_services
+ fi
+fi
+
+wait
+# still need to add more trap for different situation to make sure shutdown procedure is fallow.
+# still need to add container_variable options
