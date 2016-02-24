@@ -40,12 +40,12 @@ shutdown_runit_services() {
 }
 
 #condition for --skip-startup-files
-if ![ `echo $@ | grep -c "\-\-skip-startup-files" ` -gt 0 ] ; then
+if ! [ `echo $@ | grep -c "\-\-skip-startup-files" ` -gt 0 ] ; then
    run_startup_files
 fi
 
 #condition for --skip-runit
-if ![ `echo $@ | grep -c "\-\-skip-runit" ` -gt 0 ] ; then
+if ! [ `echo $@ | grep -c "\-\-skip-runit" ` -gt 0 ] ; then
    start_runit
   else 
   [ "$1" == '--' ] && shift
