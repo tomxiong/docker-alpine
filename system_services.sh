@@ -25,10 +25,14 @@ ln -s /etc/container_environment.sh /etc/profile.d/
 apk --no-cache add runit
 
 ## Install cron daemon.
-mkdir /etc/service/cron
+mkdir -p /etc/service/cron
+mkdir -p /etc/service/cron/log
+mkdir -p /var/log/cron
 chmod 600 /etc/crontabs
 cp /build/runit/cron /etc/service/cron/run
-chmod +x /etc/service/cron/run
+cp /build/runit/cron_log /etc/service/cron/log/run
+cp /build/config/cron_log_config /var/log/cron/config
+chmod +x /etc/service/cron/run /etc/service/cron/log/run
 
 ## Remove useless cron entries.
 # Checks for lost+found and scans for mtab.
