@@ -54,9 +54,9 @@ if ! [ `echo $temp_var | grep -c "\-\-skip-runit" ` -gt 0 ] ; then
   else 
    temp_var=$(echo $temp_var|sed "s/--skip-runit//")
    temp_var=$(echo $temp_var|sed "s/--//")
-   if [ temp_var -gt 0 ] ; then 
+   if ! [ "$temp_var" == "" ] ; then 
      exec $temp_var
    else
-    echo "wrong options"
+    echo "need to add command to do something"
    fi
 fi
