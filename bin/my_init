@@ -101,7 +101,10 @@ if  [ `echo $temp_var | grep -c "\-\- " ` -gt 0 ] ; then
 temp_var=$(echo $temp_var|sed "s/--//")
  if ! [ "$temp_var" == "" ] ; then
      #need to check if all service are online before executing command
-     sleep 5  #need to be replace with condition for before comment
+     while [ "$(/sbin/sv status /etc/service/* | grep -o "^run:")" == "run:" ]
+      do
+       sleep 1
+      done
      exec $temp_var
      shutdown_runit_services
  else
