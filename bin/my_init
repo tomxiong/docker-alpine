@@ -42,7 +42,7 @@ shutdown_runit_services() {
    echo "Begin shutting down runit services..."
    /sbin/sv down /etc/service/*
    #need to give some time and check if service is down if time greater than allow them force exit
-   while [ "$(/sbin/sv status /etc/service/* | grep -o "^run:")" != "run:" ]
+   while [ $(/sbin/sv status /etc/service/* | grep -c "^run:") != 0 ]
    do
      sleep 1
    done
@@ -101,7 +101,7 @@ if  [ `echo $temp_var | grep -c "\-\- " ` -gt 0 ] ; then
 temp_var=$(echo $temp_var|sed "s/--//")
  if ! [ "$temp_var" == "" ] ; then
      #need to check if all service are online before executing command
-     while [ "$(/sbin/sv status /etc/service/* | grep -o "^run:")" == "run:" ]
+     while [ $(/sbin/sv status /etc/service/* | grep -c "^down:") != 0 ]
       do
        sleep 1
       done
@@ -114,5 +114,4 @@ temp_var=$(echo $temp_var|sed "s/--//")
 fi
 
 wait
-# still need to add more trap for different situation to make sure shutdown procedure is fallow.
 # still need to add container_variable options
