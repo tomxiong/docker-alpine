@@ -42,9 +42,12 @@ shutdown_runit_services() {
    echo "Begin shutting down runit services..."
    /sbin/sv down /etc/service/*
    #need to give some time and check if service is down if time greater than allow them force exit
+   count=1
    while [ $(/sbin/sv status /etc/service/* | grep -c "^run:") != 0 ]
    do
      sleep 1
+     count=`expr $count + 1`
+     if [ count >= 10 ]; then break ; fi
    done
    exit 0
 }
@@ -101,9 +104,12 @@ if  [ `echo $temp_var | grep -c "\-\- " ` -gt 0 ] ; then
 temp_var=$(echo $temp_var|sed "s/--//")
  if ! [ "$temp_var" == "" ] ; then
      #need to check if all service are online before executing command
+     count=1
      while [ $(/sbin/sv status /etc/service/* | grep -c "^down:") != 0 ]
       do
        sleep 1
+       count=`expr $count + 1`
+       if [ count >= 10 ]; then break ; fi
       done
      exec $temp_var
      shutdown_runit_services
