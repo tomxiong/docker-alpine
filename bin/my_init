@@ -7,6 +7,36 @@ env > /etc/envvars
 
 temp_var=$@
 
+export_envvars () {
+ no_record="HOME USER GROUP UID GID SHELL"
+ #to begin .json and .sh file
+  echo "{" > /etc/container_environment.json
+  echo "" > /etc/container_environment.sh
+ #Take env and save it to file. individual file by variable.
+ #separate env in lines
+ env | while read -r line
+ do
+  #sepatate lines in name and values.
+  a=`expr index "$line" \=`
+  b=$((a-1))
+  file_name=${line:0:$b}
+  file_val=${line:$a}
+  if echo "$no_record" | grep -q "$file_name"
+  then
+   continue
+  else
+   # write to files ..
+    echo $file_val > /etc/container_environment/$file_name
+   #write to .sh file
+    echo "export" $line >> /etc/container_environment.sh
+   #write to .json file
+    echo "\""$file_name"\":\""$file_val"\"" >> /etc/container_environment.json
+  fi
+ done
+    #to closed the .json file
+    echo "}" >> /etc/container_environment.json
+}
+
 run_command () {
    if [ -x $1 ]; then
         echo >&2 "*** Running: $1"
@@ -52,10 +82,7 @@ shutdown_runit_services() {
    exit 0
 }
 
-#condition for --help
-if ! (([ `echo $temp_var | grep -c "\-\-help" ` -gt 0 ] || [ `echo $temp_var | grep -c "\-h" ` -gt 0 ])) ; then
-  continue
- else
+message () {
   echo "usage: my_init [-h|--help] [--skip-startup-files] [--skip-runit]"
   echo "                           [-- MAIN_COMMAND "
   echo "Initialize the system."
@@ -66,6 +93,13 @@ if ! (([ `echo $temp_var | grep -c "\-\-help" ` -gt 0 ] || [ `echo $temp_var | g
   echo "  --skip-startup-files  Skip running /etc/my_init.d/* and /etc/rc.local"
   echo "  --skip-runit          Do not run runit services"
   echo "  --quiet               Only print warnings and errors"
+}
+
+#condition for --help
+if ! (([ `echo $temp_var | grep -c "\-\-help" ` -gt 0 ] || [ `echo $temp_var | grep -c "\-h" ` -gt 0 ])) ; then
+  continue
+ else
+  message
   exit 0
 fi
 
@@ -76,7 +110,6 @@ if ! [ `echo $temp_var | grep -c "\-\-quiet" ` -gt 0 ] ; then
    temp_var=$(echo $temp_var|sed "s/--quiet//")
    echo "--quiet still need to be implememted"
 fi
-
 
 #condition for --skip-startup-files
 if ! [ `echo $temp_var | grep -c "\-\-skip-startup-files" ` -gt 0 ] ; then
@@ -96,6 +129,8 @@ if ! [ `echo $temp_var | grep -c "\-\-skip-runit" ` -gt 0 ] ; then
      exit 0
     else
       echo "Need to add command to do something:  -- command"
+      echo 
+      message
       exit 0
    fi
 fi
@@ -115,6 +150,8 @@ temp_var=$(echo $temp_var|sed "s/--//")
      shutdown_runit_services
  else
   echo "Need to add command to do something: -- command "
+  echo
+  message
   shutdown_runit_services
  fi
 fi
