@@ -1,11 +1,9 @@
 #! /bin/sh
 export LC_ALL=C TERM="xterm"
-
 trap 'shutdown_runit_services' INT TERM
-
 env > /etc/envvars
-
 temp_var=$@
+FILES=/etc/container_environment/*
 
 export_envvars () {
  no_record="HOME USER GROUP UID GID SHELL"
