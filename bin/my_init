@@ -26,7 +26,7 @@ export_envvars () {
    # write to files ..
     echo $file_val > /etc/container_environment/$file_name
    #write to .sh file
-    echo "export" $line >> /etc/container_environment.sh
+    echo "export"  $file_name"=\""$file_val"\"" >> /etc/container_environment.sh
    #write to .json file
     echo "\""$file_name"\":\""$file_val"\"" >> /etc/container_environment.json
   fi
