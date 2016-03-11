@@ -31,7 +31,7 @@ cp /build/runit/cron /etc/service/cron/run
 cp /build/runit/cron_log /etc/service/cron/log/run
 cp /build/config/cron_log_config /var/log/cron/config
 chown -R cron  /var/log/cron
-chmod +x /etc/service/cron/run /etc/service/cron
+chmod +x /etc/service/cron/run /etc/service/cron/log/run
 
 ## Often used tools.
 apk --no-cache add psmisc
