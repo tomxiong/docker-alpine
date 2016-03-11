@@ -34,9 +34,9 @@ chmod +x /etc/service/cron/run /etc/service/cron/log/run
 
 ## Remove useless cron entries.
 # Checks for lost+found and scans for mtab.
-rm -f /etc/cron.daily/standard
-rm -f /etc/cron.daily/password
-rm -f /etc/cron.weekly/fstrim
+#rm -f /etc/cron.daily/standard
+#rm -f /etc/cron.daily/password
+#rm -f /etc/cron.weekly/fstrim
 
 ## Often used tools.
 apk --no-cache add psmisc
