@@ -12,7 +12,7 @@ export_envvars () {
  no_record="HOME USER GROUP UID GID SHELL SHLVL PWD"
  #to begin .json and .sh file
   echo "{" > /etc/container_environment.json
-  echo "" > /etc/container_environment.sh
+  echo -n "" > /etc/container_environment.sh
  #Take env and save it to file. individual file by variable.
  #separate env in lines
  env | while read -r line
