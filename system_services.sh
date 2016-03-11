@@ -30,7 +30,8 @@ chmod 600 /etc/crontabs
 cp /build/runit/cron /etc/service/cron/run
 cp /build/runit/cron_log /etc/service/cron/log/run
 cp /build/config/cron_log_config /var/log/cron/config
-chmod +x /etc/service/cron/run /etc/service/cron/log/run
+chown -R nobody  /var/log/cron
+chmod +x /etc/service/cron/run /etc/service/cron
 
 ## Remove useless cron entries.
 # Checks for lost+found and scans for mtab.
