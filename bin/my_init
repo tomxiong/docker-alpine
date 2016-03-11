@@ -1,12 +1,15 @@
 #! /bin/sh
 export LC_ALL=C TERM="xterm"
+
 trap 'shutdown_runit_services' INT TERM
+
 env > /etc/envvars
 temp_var=$@
 FILES=/etc/container_environment/*
+runsvdir_PID=
 
 export_envvars () {
- no_record="HOME USER GROUP UID GID SHELL"
+ no_record="HOME USER GROUP UID GID SHELL SHLVL"
  #to begin .json and .sh file
   echo "{" > /etc/container_environment.json
   echo "" > /etc/container_environment.sh
@@ -57,12 +60,15 @@ run_startup_files() {
    done
 
    # running /etc/rc.local
+   echo "starting rc.local scritps"
    run_command /etc/rc.local
 }
 
 start_runit () {
    echo "Booting runit daemon..."
    /sbin/runsvdir -P /etc/service &
+   runsvdir_PID=$!
+   echo "Process runsvdir running with PID $runsvdir_PID"
 }
 
 shutdown_runit_services() {
@@ -158,4 +164,3 @@ temp_var=$(echo $temp_var|sed "s/--//")
 fi
 
 wait
-# still need to add container_variable options
