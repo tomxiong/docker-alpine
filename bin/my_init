@@ -11,7 +11,7 @@ runsvdir_PID=
 export_envvars () {
  no_record="HOME USER GROUP UID GID SHELL SHLVL PWD"
  #to begin .json and .sh file
-  echo "{" > /etc/container_environment.json
+  echo -n "{" > /etc/container_environment.json
   echo -n "" > /etc/container_environment.sh
  #Take env and save it to file. individual file by variable.
  #separate env in lines
@@ -31,11 +31,11 @@ export_envvars () {
    #write to .sh file
     echo "export"  $file_name"='"$file_val"'" >> /etc/container_environment.sh
    #write to .json file
-    echo "\""$file_name"\":\""$file_val"\"" >> /etc/container_environment.json
+    echo -n "\""$file_name"\":\""$file_val"\"," >> /etc/container_environment.json
   fi
  done
     #to closed the .json file
-    echo "}" >> /etc/container_environment.json
+    echo -e "\b}" >> /etc/container_environment.json
 }
 
 run_command () {
