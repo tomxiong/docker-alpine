@@ -8,7 +8,23 @@ temp_var=$@
 FILES=/etc/container_environment/*
 runsvdir_PID=
 
+import_envvars () {
+
+ clear_existing_environment=${1:-true}
+ override_existing_environment=${2:-true}
+
+ for file in $FILES
+ do
+    FILE=`basename $file`
+    if [ $override_existing_environment == true ] || !( env | grep -q $FILE)
+    then
+      export eval $FILE=`cat $file`
+    fi
+ done
+}
+
 export_envvars () {
+ to_dir=${1:-true}
  no_record="HOME USER GROUP UID GID SHELL SHLVL PWD"
  #to begin .json and .sh file
   echo -n "{" > /etc/container_environment.json
@@ -27,7 +43,7 @@ export_envvars () {
    continue
   else
    # write to files ..
-    echo $file_val > /etc/container_environment/$file_name
+    if [ $to_dir == true ] ; then echo $file_val > /etc/container_environment/$file_name ; fi
    #write to .sh file
     echo "export"  $file_name"='"$file_val"'" >> /etc/container_environment.sh
    #write to .json file
@@ -47,6 +63,9 @@ run_command () {
         then
             echo >&2 "*** Failed with return value: $?"
             exit $retval
+         else
+            import_envvars
+            export_envvars false
         fi
     fi
 }
@@ -99,8 +118,10 @@ message () {
   echo "  --quiet               Only print warnings and errors"
 }
 
-#export env
+#import & export env
+import_envvars false false
 export_envvars
+
 
 #condition for --help
 if ! (([ `echo $temp_var | grep -c "\-\-help" ` -gt 0 ] || [ `echo $temp_var | grep -c "\-h" ` -gt 0 ])) ; then
