@@ -6,7 +6,7 @@ docker-alpine
 
 The docker-alpine base on quantumobject/docker-baseimage but using alpine/edge image to create small container with runit.
 
-This image will be use to builds others image for [quantumobject](http://www.quantumobject.org) at the moment. It will be build periodical to make sure that any security update is include with the last version from alpine.
+This image will be use to builds others image for [quantumobject](http://www.quantumobject.org). It will be build periodical to make sure that any security update is include with the last version from alpine.
 
 ## Using docker-alpine as base image
 
@@ -43,19 +43,6 @@ Here's an example showing you how a memcached server runit entry can be made.
 
 Note that the shell script must run the daemon **without letting it daemonize/fork it**. Usually, daemons provide a command line flag or a config file option for that.
 
-### Adding logs for your daemons services
-
-You can add log for the service using already include commad and procedure on runit. In this case you need to add another `run` script at directory `/etc/service/<NAME>/log` 
-
-        #!/bin/sh
-        #need to make sure /var/log/<name> already create.
-        exec svlogd -t /var/log/memcached/
-
-        ### In Dockerfile:
-        RUN mkdir /etc/service/memcached/log
-        RUN mkdir /var/log/memcached
-        RUN cp /var/log/cron/config /var/log/memcached/config  # copy config for svlogd from cron config
-        ADD memcached_log.sh /etc/service/memcached/log/run
 
 ### Running scripts during container startup
 
