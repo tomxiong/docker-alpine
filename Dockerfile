@@ -1,5 +1,5 @@
 FROM alpine:edge
-MAINTAINER QuantumObject <angel@quantumobject.com>
+MAINTAINER Tom Xiong <tomxiongzh@gmail.com>
 
 ADD . /build
 
